@@ -42,7 +42,7 @@
 
 --- 
 
-#### This repo was referenced by https://github.com/big-chan/Sejong_computervision_termproject_monodepth
-InClass : https://github.com/sejongresearch/ComputerVision
-EvalAIStarters : https://github.com/sejong-rcv/EvalAI-Starters
+#### This repo was referenced by https://github.com/big-chan/Sejong_computervision_termproject_monodepth  
+InClass : https://github.com/sejongresearch/ComputerVision  
+EvalAIStarters : https://github.com/sejong-rcv/EvalAI-Starters  
 
