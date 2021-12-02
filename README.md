@@ -32,7 +32,7 @@
 - Environment : Ubuntu18.04, TITAN RTX, Docker, CUDA9.1, python3.6.6, pytorch 1.0.1
 - Reference DockerHub : https://hub.docker.com/r/iraadit/cuda9.1-cudnn7-opencv-fn
 - Trained_model : 모델이 커서 생략합니다.
-- Predicted_Submission.npy_link : 
+- Predicted_Submission.npy_link : https://drive.google.com/file/d/1-9192deJaYaqh_VAeHSUw4EOAtBrcaik/view?usp=sharing
   
 ![12345](https://user-images.githubusercontent.com/11037567/144466498-18afd658-89ba-4c6d-9536-af36e3ae4cd3.png)
 
