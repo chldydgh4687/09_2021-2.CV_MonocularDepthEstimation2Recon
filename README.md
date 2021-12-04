@@ -2,29 +2,23 @@
 
 ---
 
-### GAN (Generative Adversarial Networks)
-<img width="899" alt="6346" src="https://user-images.githubusercontent.com/11037567/143824328-a1f1f808-d869-4dba-8f2e-13c42d6e0e69.PNG">
+### How to do learning in this task?
 
----
-
-### Pix2PixHD
-
----
+![745745](https://user-images.githubusercontent.com/11037567/144722911-2177a572-0f65-4627-9ed6-177b14fa1e20.PNG)
 
 ### Loss
 
----
-
-### How to do learning in this task?
+![5547](https://user-images.githubusercontent.com/11037567/144722919-a922272f-566b-4251-8e70-a358ad54bb0c.PNG)
+![568568](https://user-images.githubusercontent.com/11037567/144722925-1482ebdf-7a90-463a-be07-174fd9118d2f.PNG)
 
 ---
 
 ### Performance to be enable to learn  
 
-- Wandb monitoring.
-- Pix2PixHD Network & Loss.
-- Dataloader Using class __ getitem __.
-- Efficient parameter parsing to source code.
+- DepthEstimation Task
+- Using Docker
+- Syntehsized view Task using DeepLearning.
+- Various loss
 
 --- 
 
