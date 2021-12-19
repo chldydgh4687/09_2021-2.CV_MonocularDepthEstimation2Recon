@@ -1,82 +1,105 @@
-# 09_2021-2.CV_MonocularDepthEstimationRecon
+# Monodepth2
 
----
 
-### Training
 
-1. Start Nvidia-docker : https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker 
-2. Checking CUDA, pytorch, python version in paper. (cuda9.1, pytorch 0.4 or 1.0.0 )
-3. Finding images in dockerHub : https://hub.docker.com/r/iraadit/cuda9.1-cudnn7-opencv-fn
-4. pull(Download) images into OS.
-```sh
-docker pull iraadit/cuda9.1-cudnn7-opencv-fn:latest
-docker images
+
+
+## ⚙️ Setup
+
+Assuming a fresh [Anaconda](https://www.anaconda.com/download/) distribution, you can install the dependencies with:
+```shell
+conda install pytorch=0.4.1 torchvision=0.2.1 -c pytorch
+pip install tensorboardX==1.4
+conda install opencv=3.3.1   # just needed for evaluation
 ```
+We ran our experiments with PyTorch 0.4.1, CUDA 9.1, Python 3.6.6 and Ubuntu 18.04.
+We have also successfully trained models with PyTorch 1.0, and our code is compatible with Python 2.7. You may have issues installing OpenCV version 3.3.1 if you use Python 3.7, we recommend to create a virtual environment with Python 3.6.6 `conda create -n monodepth2 python=3.6.6 anaconda `.
 
-![56856856](https://user-images.githubusercontent.com/11037567/146694833-1b29e995-66ab-4201-af08-348a9d4d297b.PNG)
+<!-- We recommend using a [conda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html) to avoid dependency conflicts.
 
-  
-5. Create Container
-```
-#보통의 경우
-$docker run --name $컨테이너이름 -it (images_id)
+We also recommend using `pillow-simd` instead of `pillow` for faster image preprocessing in the dataloaders. -->
 
-#gpu버전의 경우(nvidia-docker)
-$docker run --gpus all --name $컨테이너이름 -it (images_id) bash
 
-# Display all of containers
-$docker ps -a
-```
+## 학습 데이터 준비
 
-6. anacodna3, pytorch 1.0.0 install
-7. Following Gudieline (https://github.com/big-chan/Sejong_computervision_termproject_monodepth)
-```
+### KITTI
+
+- KITTI 데이터셋은 Lidar, IMU, GPU, RGB stereo 등 다양한 센서를 포함한 자율주행 학습용 데이터셋으로 매우 다양한 분야에서 사용되고 있습니다. KITTI 벤치마크는 실외 환경의 자동차 운전 장면으로 구성됩니다. 데이터 세트는 배경에 나타나는 많은 동적 개체와 빠른 자동차 움직임을 포함합니다. 본 코드는 학습과 평가를 위해서 Eigen의 split 한 것을 사용했고 또한 static frames을 제거하기 위해서 Zhou~의 pre-processing 방법론을 따랐습니다. 그 결과는  총 39,810 개의 target images와 source image pairs로 이뤄진  학습데이터와 694장의 test image 으로 구성됩니다. 
+
+- 데이터 셋 다운로드 
+아래 코드를 이 폴더에서 실행해서 데이터셋을 다운 받으실 수 있습니다.:
+```shell
 wget -i splits/kitti_archives_to_download.txt -P kitti_data/
+```
+Then unzip with
+```shell
 cd kitti_data
 unzip "*.zip"
 cd ..
-
-CUDA_VISIBLE_DEVICES=0 python train.py --model_name tested --png --log_dir tested_log
 ```
 
-### Training Monitoring
-  
-![training](https://user-images.githubusercontent.com/11037567/144466246-6c4aaf46-7814-47cd-ae18-f896790ee439.PNG)
+**Warning:** 데이터가 총 175GB이니 용량을 유의하시길 바랍니다. 
 
 
----
 
-### EvalAI LeaderBoard
-- Environment : Ubuntu18.04, TITAN RTX, Docker, CUDA9.1, python3.6.6, pytorch 1.0.1
-- Reference DockerHub : 
-- Trained_model : 모델이 커서 생략합니다.
-- Predicted_Submission.npy_link : https://drive.google.com/file/d/1-9192deJaYaqh_VAeHSUw4EOAtBrcaik/view?usp=sharing
-  
-![12345](https://user-images.githubusercontent.com/11037567/144466498-18afd658-89ba-4c6d-9536-af36e3ae4cd3.png)
+## ⏳ Training
 
----
+- 실행 명령어 입니다. 위에서 kitti_data를 다운 받았다면 아래 코드를 실행시켜서 학습시켜 주면 됩니다. 
+    - log가 저장되는 default가 ~/tmp 이며 변경하고 싶으면 log_directory 를 원하는 경로로 변경바랍니다. 
+    - log_name 또한 변경하여 실해시켜주시길 바랍니다. 
+    
+**Monocular training:**
+```shell
+python train.py --model_name {log_name} --png --log_dir {log_directory}
+```
 
-### How to do learning in this task?
 
-![745745](https://user-images.githubusercontent.com/11037567/144722911-2177a572-0f65-4627-9ed6-177b14fa1e20.PNG)
 
-### Loss
+### GPUs
 
-![5547](https://user-images.githubusercontent.com/11037567/144722919-a922272f-566b-4251-8e70-a358ad54bb0c.PNG)
-![568568](https://user-images.githubusercontent.com/11037567/144722925-1482ebdf-7a90-463a-be07-174fd9118d2f.PNG)
+- 현재 코드는 단일 GPU로 동작할 수 있게 되어있습니다. 만약 GPU 번호를 바꾸고 싶으시면 아래와 같이 `CUDA_VISIBLE_DEVICES`의 번호를 변경해주시길 바랍니다.
 
----
+```shell
+CUDA_VISIBLE_DEVICES=2 python train.py --model_name mono_model
+```
 
-### Performance to be enable to learn  
+모든 실험은 Titan Xp 에서 실험했으며 아래와 같이 GPU를 사용하게 됩니다. 
 
-- DepthEstimation Task
-- Using Docker
-- Syntehsized view Task using DeepLearning.
-- Various loss
+| Training modality | Approximate GPU memory  | Approximate training time   |
+|-------------------|-------------------------|-----------------------------|
+| Mono              | 9GB                     | 12 hours                    |
 
---- 
 
-#### This repo was referenced by https://github.com/big-chan/Sejong_computervision_termproject_monodepth  
-InClass : https://github.com/sejongresearch/ComputerVision  
-EvalAIStarters : https://github.com/sejong-rcv/EvalAI-Starters  
 
+### 💽 Finetuning a pretrained model
+
+- 학습해둔 모델을 finetuning 하고싶으시면 아래와 같이 --load_weights_folder를 이용해 경로를 지정해주시길 바랍니다. :
+```shell
+python train.py --model_name finetuned_mono --load_weights_folder ~/tmp/mono_model/models/weights_19
+```
+
+
+### 🔧 Other training options
+
+- 다른 학습 옵션을 보고싶으시면 ```option.py'''를 보시길 바랍니다 .
+
+### download pretrained model
+
+- 베이스 성능에 사용된 checkpoint download 
+```
+wget https://storage.googleapis.com/niantic-lon-static/research/monodepth2/mono_640x192.zip
+unzip mono_640x192.zip
+```
+
+
+## 평가 영상 생성
+- 리더보드에 제출하기 위한 영상을 생성하기 위해서는 아래와 같이 실행시켜주시길 바랍니다. 
+    -학습하신 모델의 경로를 load_weights_folder에 넣고 돌리시면 현재폴더에 ```disp_eigen_split.npz``` 가 생성될 것입니다. 그 파일을 제출해주시면 됩니다. 
+```shell
+python evaluate_depth.py --load_weights_folder ~/tmp/stereo_model/models/weights_19/ --eval_mono
+```
+
+## 👩‍⚖️ License
+Copyright © Niantic, Inc. 2019. Patent Pending.
+All rights reserved.
+Please see the [license file](LICENSE) for terms.
